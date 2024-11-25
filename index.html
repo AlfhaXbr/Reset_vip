@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Nutrição VIP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FF6F61, #FFB74D);
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            color: #FF6F61;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .question-container {
+            margin-bottom: 20px;
+        }
+
+        .question-container h2 {
+            color: #444;
+            font-size: 1.3rem;
+        }
+
+        .category {
+            color: #FF6F61;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .answers-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .answer {
+            background-color: #FFB74D;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .answer:hover {
+            background-color: #FFA726;
+            transform: scale(1.05);
+        }
+
+        .correct {
+            background-color: #4CAF50;
+        }
+
+        .incorrect {
+            background-color: #F44336;
+        }
+
+        .status-bar {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            color: #444;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background-color: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: #FF6F61;
+            transition: width 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Quiz Nutrição VIP</h1>
+        </div>
+        <div class="question-container">
+            <p id="category" class="category">Categoria: Nutrição</p>
+            <h2 id="question">Qual é o nutriente essencial para construção muscular?</h2>
+        </div>
+        <div class="answers-container">
+            <button class="answer" data-id="0">Carboidratos</button>
+            <button class="answer" data-id="1">Proteínas</button>
+            <button class="answer" data-id="2">Gorduras</button>
+            <button class="answer" data-id="3">Vitaminas</button>
+        </div>
+        <div class="progress-bar">
+            <div id="progress" class="progress"></div>
+        </div>
+        <div class="status-bar">
+            <p>Pontuação: <span id="score">0</span></p>
+            <p>Tempo Restante: <span id="time">30</span>s</p>
+        </div>
+    </div>
+    <script>
+        const questions = [
+            {
+                category: "Nutrição",
+                question: "Qual é o nutriente essencial para construção muscular?",
+                options: ["Carboidratos", "Proteínas", "Gorduras", "Vitaminas"],
+                answer: 1
+            },
+            {
+                category: "Nutrição Esportiva",
+                question: "Qual bebida é ideal para hidratação pós-treino?",
+                options: ["Refrigerante", "Água", "Suco artificial", "Leite integral"],
+                answer: 1
+            },
+            {
+                category: "Nutrição Geral",
+                question: "Qual vitamina é conhecida por fortalecer o sistema imunológico?",
+                options: ["Vitamina A", "Vitamina B12", "Vitamina C", "Vitamina K"],
+                answer: 2
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeLeft = 30;
+        const progressElem = document.getElementById('progress');
+        const categoryElem = document.getElementById('category');
+        const questionElem = document.getElementById('question');
+        const answersButtons = document.querySelectorAll('.answer');
+        const scoreElem = document.getElementById('score');
+        const timeElem = document.getElementById('time');
+
+        function loadQuestion() {
+            const questionData = questions[currentQuestionIndex];
+            categoryElem.textContent = `Categoria: ${questionData.category}`;
+            questionElem.textContent = questionData.question;
+            answersButtons.forEach((button, index) => {
+                button.textContent = questionData.options[index];
+                button.className = 'answer';
+                button.disabled = false;
+            });
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressElem.style.width = `${progress}%`;
+        }
+
+        function checkAnswer(selectedIndex) {
+            const questionData = questions[currentQuestionIndex];
+            const isCorrect = selectedIndex === questionData.answer;
+
+            answersButtons[selectedIndex].classList.add(isCorrect ? 'correct' : 'incorrect');
+            if (isCorrect) score++;
+
+            scoreElem.textContent = score;
+
+            answersButtons.forEach((button, index) => {
+                button.disabled = true;
+                if (index === questionData.answer) button.classList.add('correct');
+            });
+
+            setTimeout(nextQuestion, 1000);
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            alert(`Quiz Finalizado! Sua pontuação: ${score}`);
+            window.location.href = 'compra.html';
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            timeElem.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                endQuiz();
+            }
+        }
+
+        answersButtons.forEach((button, index) => {
+            button.addEventListener('click', () => checkAnswer(index));
+        });
+
+        loadQuestion();
+        const timer = setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>
